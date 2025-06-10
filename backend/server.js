@@ -19,13 +19,13 @@ connectCloudinary()
 app.use(express.json())
 
 
-
-app.use(cors({
-    credentials: true,
-    origin:["http://localhost:5173","https://final-ecommerce-tan.vercel.app/","http://localhost:5174"], // Allow all origins temporarily for debugging
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'token']
-}))
+app.use(cors());
+// app.use(cors({
+//     credentials: true,
+//     origin:["http://localhost:5173","https://final-ecommerce-tan.vercel.app/","http://localhost:5174"], // Allow all origins temporarily for debugging
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization', 'token']
+// }))
 
 // Add headers middleware for additional debugging
 app.use((req, res, next) => {
