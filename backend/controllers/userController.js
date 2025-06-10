@@ -3,7 +3,9 @@ import bcrypt from "bcrypt"
 import jwt from 'jsonwebtoken'
 import userModel from "../models/userModel.js";
 import nodemailer from "nodemailer";
-
+import axios from 'axios'
+import { configDotenv } from "dotenv";
+configDotenv();
 const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET)
 }
@@ -61,7 +63,7 @@ const registerUser = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            isVerified: false
+            isVerified: true
         })
 
         const user = await newUser.save()
@@ -144,6 +146,17 @@ Thanks for visiting Treenza!`
         res.json({ success: false, message: 'Failed to send OTP' });
     }
 }
+//mobileotp
+const mobileotp = async (req, res) => {
+    const { phone } = req.body;
+
+  try {
+    const response = await axios.get(`https://2factor.in/API/V1/108c9ae6-448c-11f0-a562-0200cd936042/SMS/${phone}/AUTOGEN/MYLOGINOTP`);
+    res.json({ success: true, sessionId: response.data.Details });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to send OTP", error: error.message });
+  }
+};
 
 // Send OTP for password reset
 const sendPasswordOtp = async (req, res) => {
@@ -202,6 +215,20 @@ const sendPasswordOtp = async (req, res) => {
     }
 }
 
+const mobileOtpVerify= async(req, res)=>{
+    const { sessionId, otp } = req.body;
+
+  try {
+    const response = await axios.get(`https://2factor.in/API/V1/${process.env.TWOFACTOR_API_KEY}/SMS/VERIFY/${sessionId}/${otp}`);
+    if (response.data.Status === "Success") {
+      res.json({ success: true, message: "OTP verified successfully" });
+    } else {
+      res.status(400).json({ success: false, message: "Incorrect OTP" });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: "OTP verification failed", error: error.message });
+  }
+};
 // Verify OTP
 const verifyOtp = async (req, res) => {
     try {
@@ -306,6 +333,38 @@ const forgotPassword = async (req, res) => {
     }
 }
 
+const googleLogin = async (req, res) => {
+    const { credential } = req.body;
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        const { email, name } = payload;
+        let user = await userModel.findOne({ email });
+
+        if (!user) {
+            user = new userModel({
+                name,
+                email,
+                isVerified: true,
+            });
+            console.log("New user created:", user); // Log new user
+            await user.save();
+        } else {
+            console.log("Existing user found:", user); // Log existing user
+        }
+
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+            expiresIn: '1d',
+        });
+        res.json({ message: "true", token, user });
+    } catch (error) {
+        res.status(400).json({ error: "Invalid Google token" });
+    }
+};
+
 export { 
     loginUser, 
     registerUser, 
@@ -314,5 +373,8 @@ export {
     sendPasswordOtp,
     verifyOtp, 
     resendOtp,
-    forgotPassword 
+    forgotPassword ,
+    mobileOtpVerify,
+    mobileotp,
+    googleLogin
 }

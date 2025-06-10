@@ -24,6 +24,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import UpdatePassword from './pages/UpdatePassword'
 import HelpDeskBtn from './pages/HelpDeskBtn'
 import ScrollToTop from './components/ScrollToTop'
+import GoogleLoginButton from './components/GoogleLoginButton'
 
 const App = () => {
   return (
@@ -33,6 +34,7 @@ const App = () => {
       <Navbar />
       <SearchBar />
       <Routes>
+        <Route path='/login2' element={<GoogleLoginButton/>}/>
         <Route path='/' element={<Home />} />
         <Route path='/collection' element={<Collection />} />
         <Route path='/about' element={<About />} />

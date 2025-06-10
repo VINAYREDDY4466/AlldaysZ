@@ -55,7 +55,7 @@ import p_img51 from './p_img51.png'
 import p_img52 from './p_img52.png'
 import MainLogo from './MainLogo.png'
 import MainLogo2 from './Mainlogo2.png'
-
+import alldaysz from './AllDayz.png'
 
 import logo from './logo.png'
 import hero_img from './hero_img.png'
@@ -81,7 +81,12 @@ import FinalLogo from './FinalLogo.png'
 import Hero1 from './hero1.webp'
 import Image from './image.png'
 import Heroo from './Herro.png'
+import all2 from './All2.png'
+import all3 from './all3.png'
 export const assets = {
+    all3,
+    alldaysz,
+    all2,
     Heroo,
     Image,
     Hero1,
